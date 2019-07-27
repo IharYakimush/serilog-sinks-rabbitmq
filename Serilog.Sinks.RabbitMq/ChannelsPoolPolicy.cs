@@ -16,9 +16,15 @@ namespace Serilog.Sinks.RabbitMq
 
         public IModel Create()
         {
-            IModel model = this.Connection.CreateModel();
+            IModel channel = this.Connection.CreateModel();
+            //channel.ExchangeDeclare(this.Options.Exchange);
+            if (this.Options.ComfirmPublish)
+            {
+                channel.ConfirmSelect();
+            }
+
             //TODO: bind model
-            return model;
+            return channel;
         }
 
         public bool Return(IModel obj)

@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Serilog RabbitMQ Sink. Can be used with AuditTo and WriteTo. Support publish comfirmations. Use 1 connection per application and 1 channel per thread according to RabbitMQ recomendations.</Description>
+    <Authors>IharYakimush</Authors>
+    <Product>Serilog.Sinks.RabbitMq.Publisher</Product>
+    <PackageLicenseUrl>https://github.com/IharYakimush/serilog-sinks-rabbitmq/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/IharYakimush/serilog-sinks-rabbitmq</PackageProjectUrl>
+    <PackageTags>serilog sink rabbitmq</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
