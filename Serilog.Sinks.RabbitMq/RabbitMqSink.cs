@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using RabbitMQ.Client;
 using Serilog.Core;
@@ -37,7 +40,8 @@ namespace Serilog.Sinks.RabbitMq
 
             Connection = factory.CreateConnection(endpointResolver, clientProviderName ?? DefaultClientProviderName);
 
-            this.InitChannelsPool();
+            this.Initialize();
+            this.Validate();
         }
 
         public RabbitMqSink(
@@ -59,28 +63,35 @@ namespace Serilog.Sinks.RabbitMq
         }
 
         /// <summary>
-        /// Create RabbitMqSink whitch will use existing connection. In this case connection will not be closed/disposed during sink disposal.
+        /// Create RabbitMqSink which will use existing connection.
         /// </summary>
+        /// <param name="formatter"></param>
         /// <param name="options"></param>
-        /// <param name="connection"></param>
-        public RabbitMqSink(ITextFormatter formatter, RabbitMqSinkOptions options, IConnection connection)
+        /// <param name="connection">Existing opened connection</param>
+        /// <param name="autoCloseConnection">If true connection will be closed and disposed during sink disposal.</param>
+        public RabbitMqSink(ITextFormatter formatter, RabbitMqSinkOptions options, IConnection connection, bool autoCloseConnection = true)
         {
             Formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
             Options = options ?? throw new ArgumentNullException(nameof(options));
             Connection = connection ?? throw new ArgumentNullException(nameof(connection));
+
+            this.disposeConnection = autoCloseConnection;
 
             if (!connection.IsOpen)
             {
                 throw new ArgumentException(connection.CloseReason.ToString(), nameof(connection));
             }
 
-            this.InitChannelsPool();            
+            this.Initialize();            
+            this.Validate();            
         }
 
         public ITextFormatter Formatter { get; }
         public RabbitMqSinkOptions Options { get; }
         public IConnection Connection { get; private set; }
         private ObjectPool<IModel> channelsPool;
+        private ObjectPool<StringBuilder> stringBuildersPool;
+        private Encoding encoding;
 
         private readonly bool disposeConnection = false;
         private bool disposed = false;
@@ -103,18 +114,27 @@ namespace Serilog.Sinks.RabbitMq
                            $"{logEvent.Level}.{(logEvent.Properties.ContainsKey(Source) ? logEvent.Properties[Source].ToString() : Unknown)}"
                            .ToLowerInvariant();
 
-            string exchange = this.Options.Exchange ?? DefaultExchange;
+            string exchange = this.Options.ExchangeName ?? DefaultExchange;
 
-            byte[] body = new byte[0];
+            StringBuilder sb = this.stringBuildersPool.Get();
+
+            using (TextWriter writer = new StringWriter(sb))
+            {
+                this.Formatter.Format(logEvent, writer);
+            }
+
+            byte[] body = this.encoding.GetBytes(sb.ToString());
+
+            this.stringBuildersPool.Return(sb);
 
             //TODO: what if channel from pool can't be used ?
             var channel = this.channelsPool.Get();
 
-            channel.BasicPublish(exchange, routingKey, false, this.Options.BasicProperties, body);
+            channel.BasicPublish(exchange, routingKey, this.Options.Mandatory, this.Options.BasicProperties, body);
 
-            if (this.Options.ComfirmPublish)
+            if (this.Options.ConfirmPublish)
             {
-                channel.WaitForConfirmsOrDie(this.Options.ComfirmPublishTimeout);
+                channel.WaitForConfirmsOrDie(this.Options.ConfirmPublishTimeout);
             }
 
             this.channelsPool.Return(channel);
@@ -137,14 +157,26 @@ namespace Serilog.Sinks.RabbitMq
             GC.SuppressFinalize(this);
         }
 
-        private void InitChannelsPool()
+        private void Initialize()
         {
+            this.stringBuildersPool = new DefaultObjectPool<StringBuilder>(
+                new StringBuilderPooledObjectPolicy
+                {
+                    InitialCapacity = this.Options.StringBuilderInitialCapacity,
+                    MaximumRetainedCapacity = this.Options.StringBuilderMaxRetainedCapacity
+                }, this.Options.StringBuilderPoolMaxRetainedCount);
+
             this.channelsPool = new DefaultObjectPool<IModel>(new ChannelsPoolPolicy(this.Connection, this.Options),
                 this.Options.ChannelsPoolMaxRetained);
 
+            this.encoding = Encoding.GetEncoding(this.Options.EncodingName);
+        }
+
+        private void Validate()
+        {
             // Try to get channel to ensure that exchange can be created without issues
             var channel = this.channelsPool.Get();
-            this.channelsPool.Return(channel);
+            this.channelsPool.Return(channel);            
         }
     }
 }

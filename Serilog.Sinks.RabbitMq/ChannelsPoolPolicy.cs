@@ -17,13 +17,16 @@ namespace Serilog.Sinks.RabbitMq
         public IModel Create()
         {
             IModel channel = this.Connection.CreateModel();
-            //channel.ExchangeDeclare(this.Options.Exchange);
-            if (this.Options.ComfirmPublish)
+            channel.ExchangeDeclare(this.Options.ExchangeName, this.Options.ExchangeType, this.Options.ExchangeDurable,
+                this.Options.ExchangeAutoDelete, this.Options.ExchangeArguments);
+
+            this.Options?.ChannelSetup?.Invoke(channel);
+
+            if (this.Options.ConfirmPublish)
             {
                 channel.ConfirmSelect();
             }
 
-            //TODO: bind model
             return channel;
         }
 
