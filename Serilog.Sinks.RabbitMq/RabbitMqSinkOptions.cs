@@ -9,14 +9,6 @@ namespace Serilog.Sinks.RabbitMq
     {             
         public int ChannelsPoolMaxRetained { get; set; } = 5;
 
-        public int StringBuilderPoolMaxRetainedCount { get; set; } = 10;
-
-        public int StringBuilderInitialCapacity { get; set; } = 100;
-
-        public int StringBuilderMaxRetainedCapacity { get; set; } = 5 * 1024;
-
-        public string EncodingName { get; set; } = "UTF8";
-
         public string ExchangeName { get; set; } = RabbitMqSink.DefaultExchange;
 
         public bool ExchangeDurable { get; set; } = true;
@@ -38,7 +30,7 @@ namespace Serilog.Sinks.RabbitMq
 
         public TimeSpan ConfirmPublishTimeout { get; set; } = TimeSpan.FromSeconds(5);
 
-        public Func<LogEvent,string> RoutingKeyFactory { get; set; }
+        public Func<LogEvent, string> RoutingKeyFactory { get; set; } = null;
 
         public IBasicProperties BasicProperties { get; set; } = null;
     }

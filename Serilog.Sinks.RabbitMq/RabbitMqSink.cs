@@ -19,10 +19,22 @@ namespace Serilog.Sinks.RabbitMq
         public const string Source = "Source";
 
         public RabbitMqSink(
-            ITextFormatter formatter,
             RabbitMqSinkOptions options,
             IEndpointResolver endpointResolver,
-            Action<ConnectionFactory> connectionFactorySetup = null,             
+            Action<ConnectionFactory> connectionFactorySetup,
+            ITextFormatter formatter,
+            TextToBinaryFormatterOptions formatterOptions = null,
+            string clientProviderName = null) : this(options, endpointResolver, connectionFactorySetup,
+            new TextToBinaryFormatter(formatter ?? throw new ArgumentNullException(nameof(formatter)),
+                formatterOptions), clientProviderName)
+        {
+        }
+
+        public RabbitMqSink(
+            RabbitMqSinkOptions options,
+            IEndpointResolver endpointResolver,
+            Action<ConnectionFactory> connectionFactorySetup,
+            IBinaryFormatter binaryFormatter,
             string clientProviderName = null)
         {
             if (endpointResolver == null)
@@ -30,13 +42,15 @@ namespace Serilog.Sinks.RabbitMq
                 throw new ArgumentNullException(nameof(endpointResolver));
             }
 
-            Formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            if (connectionFactorySetup == null) throw new ArgumentNullException(nameof(connectionFactorySetup));
+
+            Formatter = binaryFormatter ?? throw new ArgumentNullException(nameof(binaryFormatter));
             Options = options ?? throw new ArgumentNullException(nameof(options));
 
             this.disposeConnection = true;
 
             ConnectionFactory factory = new ConnectionFactory();
-            connectionFactorySetup?.Invoke(factory);
+            connectionFactorySetup.Invoke(factory);
 
             Connection = factory.CreateConnection(endpointResolver, clientProviderName ?? DefaultClientProviderName);
 
@@ -45,33 +59,50 @@ namespace Serilog.Sinks.RabbitMq
         }
 
         public RabbitMqSink(
-            ITextFormatter formatter,
             RabbitMqSinkOptions options,
             IList<AmqpTcpEndpoint> endpoints,
-            Action<ConnectionFactory> connectionFactorySetup = null,
-            string clientProviderName = null) : this(formatter, options, new DefaultEndpointResolver(endpoints), connectionFactorySetup, clientProviderName)
+            Action<ConnectionFactory> connectionFactorySetup,
+            IBinaryFormatter binaryFormatter,
+            string clientProviderName = null) : this(options, new DefaultEndpointResolver(endpoints),
+            connectionFactorySetup, binaryFormatter, clientProviderName)
         {
         }
 
         public RabbitMqSink(
-            ITextFormatter formatter,
             RabbitMqSinkOptions options,
             AmqpTcpEndpoint endpoint,
-            Action<ConnectionFactory> connectionFactorySetup = null,
-            string clientProviderName = null) : this(formatter ,options, new List<AmqpTcpEndpoint> {endpoint}, connectionFactorySetup, clientProviderName)
+            Action<ConnectionFactory> connectionFactorySetup,
+            IBinaryFormatter binaryFormatter,
+            string clientProviderName = null) : this(options, new List<AmqpTcpEndpoint> {endpoint},
+            connectionFactorySetup, binaryFormatter, clientProviderName)
         {
         }
 
-        /// <summary>
-        /// Create RabbitMqSink which will use existing connection.
-        /// </summary>
-        /// <param name="formatter"></param>
-        /// <param name="options"></param>
-        /// <param name="connection">Existing opened connection</param>
-        /// <param name="autoCloseConnection">If true connection will be closed and disposed during sink disposal.</param>
-        public RabbitMqSink(ITextFormatter formatter, RabbitMqSinkOptions options, IConnection connection, bool autoCloseConnection = true)
+        public RabbitMqSink(
+            RabbitMqSinkOptions options,
+            IList<AmqpTcpEndpoint> endpoints,
+            Action<ConnectionFactory> connectionFactorySetup,
+            ITextFormatter formatter,
+            TextToBinaryFormatterOptions formatterOptions = null,
+            string clientProviderName = null) : this(options, new DefaultEndpointResolver(endpoints),
+            connectionFactorySetup, formatter, formatterOptions, clientProviderName)
         {
-            Formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+        }
+
+        public RabbitMqSink(
+            RabbitMqSinkOptions options,
+            AmqpTcpEndpoint endpoint,
+            Action<ConnectionFactory> connectionFactorySetup,
+            ITextFormatter formatter,
+            TextToBinaryFormatterOptions formatterOptions = null,
+            string clientProviderName = null) : this(options, new List<AmqpTcpEndpoint> { endpoint },
+            connectionFactorySetup, formatter, formatterOptions, clientProviderName)
+        {
+        }
+
+        public RabbitMqSink(RabbitMqSinkOptions options, IConnection connection, IBinaryFormatter binaryFormatter, bool autoCloseConnection = true)
+        {
+            Formatter = binaryFormatter ?? throw new ArgumentNullException(nameof(binaryFormatter));
             Options = options ?? throw new ArgumentNullException(nameof(options));
             Connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
@@ -82,16 +113,30 @@ namespace Serilog.Sinks.RabbitMq
                 throw new ArgumentException(connection.CloseReason.ToString(), nameof(connection));
             }
 
-            this.Initialize();            
-            this.Validate();            
+            this.Initialize();
+            this.Validate();
         }
 
-        public ITextFormatter Formatter { get; }
+        /// <summary>
+        /// Create RabbitMqSink which will use existing connection.
+        /// </summary>
+        /// <param name="formatter"></param>
+        /// <param name="options"></param>
+        /// <param name="connection">Existing opened connection</param>
+        /// <param name="formatterOptions">Options for converting text to bytes array send in message</param>
+        /// <param name="autoCloseConnection">If true connection will be closed and disposed during sink disposal.</param>
+        public RabbitMqSink(RabbitMqSinkOptions options, IConnection connection, ITextFormatter formatter,
+            TextToBinaryFormatterOptions formatterOptions = null,
+            bool autoCloseConnection = true) : this(options, connection,
+            new TextToBinaryFormatter(formatter, formatterOptions),
+            autoCloseConnection)
+        {
+        }
+
+        public IBinaryFormatter Formatter { get; }
         public RabbitMqSinkOptions Options { get; }
         public IConnection Connection { get; private set; }
         private ObjectPool<IModel> channelsPool;
-        private ObjectPool<StringBuilder> stringBuildersPool;
-        private Encoding encoding;
 
         private readonly bool disposeConnection = false;
         private bool disposed = false;
@@ -108,7 +153,7 @@ namespace Serilog.Sinks.RabbitMq
                 throw new InvalidOperationException(this.Connection.CloseReason.ToString());
             }
 
-            this.Formatter.Format(logEvent, null);
+            byte[] body = this.Formatter.GetBytes(logEvent);
 
             string routingKey = this.Options.RoutingKeyFactory?.Invoke(logEvent) ??
                            $"{logEvent.Level}.{(logEvent.Properties.ContainsKey(Source) ? logEvent.Properties[Source].ToString() : Unknown)}"
@@ -116,34 +161,34 @@ namespace Serilog.Sinks.RabbitMq
 
             string exchange = this.Options.ExchangeName ?? DefaultExchange;
 
-            StringBuilder sb = this.stringBuildersPool.Get();
-
-            using (TextWriter writer = new StringWriter(sb))
-            {
-                this.Formatter.Format(logEvent, writer);
-            }
-
-            byte[] body = this.encoding.GetBytes(sb.ToString());
-
-            this.stringBuildersPool.Return(sb);
-
             //TODO: what if channel from pool can't be used ?
-            var channel = this.channelsPool.Get();
+            IModel channel = this.channelsPool.Get();
 
-            channel.BasicPublish(exchange, routingKey, this.Options.Mandatory, this.Options.BasicProperties, body);
-
-            if (this.Options.ConfirmPublish)
+            try
             {
-                channel.WaitForConfirmsOrDie(this.Options.ConfirmPublishTimeout);
-            }
+                channel.BasicPublish(exchange, routingKey, this.Options.Mandatory, this.Options.BasicProperties, body);
 
-            this.channelsPool.Return(channel);
+                if (this.Options.ConfirmPublish)
+                {
+                    channel.WaitForConfirmsOrDie(this.Options.ConfirmPublishTimeout);
+                }
+            }
+            finally 
+            {
+                this.channelsPool.Return(channel);
+            }                       
         }        
 
         public void Dispose()
         {
             if (!disposed)
             {
+                // Dispose channels opened by sink
+                if (this.channelsPool is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+
                 if (this.disposeConnection)
                 {
                     this.Connection.Close();
@@ -159,24 +204,17 @@ namespace Serilog.Sinks.RabbitMq
 
         private void Initialize()
         {
-            this.stringBuildersPool = new DefaultObjectPool<StringBuilder>(
-                new StringBuilderPooledObjectPolicy
-                {
-                    InitialCapacity = this.Options.StringBuilderInitialCapacity,
-                    MaximumRetainedCapacity = this.Options.StringBuilderMaxRetainedCapacity
-                }, this.Options.StringBuilderPoolMaxRetainedCount);
-
-            this.channelsPool = new DefaultObjectPool<IModel>(new ChannelsPoolPolicy(this.Connection, this.Options),
-                this.Options.ChannelsPoolMaxRetained);
-
-            this.encoding = Encoding.GetEncoding(this.Options.EncodingName);
+            // Create pool from provider to create Disposable pool instance
+            this.channelsPool =
+                new DefaultObjectPoolProvider {MaximumRetained = this.Options.ChannelsPoolMaxRetained}.Create(
+                    new ChannelsPoolPolicy(this.Connection, this.Options));
         }
 
         private void Validate()
         {
             // Try to get channel to ensure that exchange can be created without issues
             var channel = this.channelsPool.Get();
-            this.channelsPool.Return(channel);            
+            this.channelsPool.Return(channel);
         }
     }
 }
