@@ -16,7 +16,7 @@ namespace Serilog.Sinks.RabbitMq
         public const string DefaultClientProviderName = nameof(RabbitMqSink);
         public const string DefaultExchange = "exc.serilog";
         public const string Unknown = "unknown";
-        public const string Source = "Source";
+        public const string SourceContext = "SourceContext";
 
         public RabbitMqSink(
             RabbitMqSinkOptions options,
@@ -156,7 +156,7 @@ namespace Serilog.Sinks.RabbitMq
             byte[] body = this.Formatter.GetBytes(logEvent);
 
             string routingKey = this.Options.RoutingKeyFactory?.Invoke(logEvent) ??
-                           $"{logEvent.Level}.{(logEvent.Properties.ContainsKey(Source) ? logEvent.Properties[Source].ToString() : Unknown)}"
+                           $"l.{logEvent.Level}.s.{(logEvent.Properties.ContainsKey(SourceContext) ? logEvent.Properties[SourceContext].ToString().Trim('"') : Unknown)}"
                            .ToLowerInvariant();
 
             string exchange = this.Options.ExchangeName ?? DefaultExchange;
