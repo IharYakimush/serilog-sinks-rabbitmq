@@ -8,11 +8,12 @@ namespace Serilog.Sinks.RabbitMq
     public class RabbitMqSinkOptions
     {
         public const string DefaultWriteToExchange = "exc.serilog.logs";
-
         public const string DefaultAuditToExchange = "exc.serilog.audit";
+
         private string _exchangeName = DefaultWriteToExchange;
         private string _exchangeType = RabbitMQ.Client.ExchangeType.Topic;
         private int _channelsPoolMaxRetained = 5;
+        private TimeSpan _messageExpiration = TimeSpan.FromDays(1);
 
         public int ChannelsPoolMaxRetained
         {
@@ -31,14 +32,15 @@ namespace Serilog.Sinks.RabbitMq
         public string ExchangeType
         {
             get => _exchangeType;
-            set => _exchangeType = RabbitMQ.Client.ExchangeType.All().Contains(value) ? value : throw new ArgumentException($"Allowed values {string.Join(", ", RabbitMQ.Client.ExchangeType.All())}");
+            set => _exchangeType = RabbitMQ.Client.ExchangeType.All().Contains(value)
+                ? value
+                : throw new ArgumentException($"Allowed values {string.Join(", ", RabbitMQ.Client.ExchangeType.All())}",
+                    nameof(ExchangeType));
         }
 
         public IDictionary<string, object> ExchangeArguments { get; set; } = null;
 
         public Action<IModel> ChannelSetup { get; set; } = null;
-
-        public bool Mandatory { get; set; } = false;
 
         /// <summary>
         /// Set to true sink will wait for publish confirmation (https://www.rabbitmq.com/confirms.html#publisher-confirms) and in case of failure exception will be thrown. 
@@ -47,8 +49,16 @@ namespace Serilog.Sinks.RabbitMq
 
         public TimeSpan ConfirmPublishTimeout { get; set; } = TimeSpan.FromSeconds(5);
 
-        public Func<LogEvent, string> RoutingKeyFactory { get; set; } = null;
+        public bool MessageMandatory { get; set; } = false;
 
-        public IBasicProperties BasicProperties { get; set; } = null;
+        public Func<LogEvent, string> MessageRoutingKeyFactory { get; set; } = null;
+
+        public Action<LogEvent, IBasicProperties> MessagePropertiesSetup { get; set; } = null;
+
+        public TimeSpan MessageExpiration
+        {
+            get => _messageExpiration;
+            set => _messageExpiration = value.TotalMilliseconds >= 0 ? value : throw new ArgumentException();
+        }
     }
 }

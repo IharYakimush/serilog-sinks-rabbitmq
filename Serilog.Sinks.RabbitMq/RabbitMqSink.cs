@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Impl;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
@@ -135,7 +136,7 @@ namespace Serilog.Sinks.RabbitMq
 
         public IBinaryFormatter Formatter { get; }
         public RabbitMqSinkOptions Options { get; }
-        public IConnection Connection { get; private set; }
+        public IConnection Connection { get; }
         private ObjectPool<IModel> channelsPool;
 
         private readonly bool disposeConnection = false;
@@ -155,16 +156,21 @@ namespace Serilog.Sinks.RabbitMq
 
             byte[] body = this.Formatter.GetBytes(logEvent);
 
-            string routingKey = this.Options.RoutingKeyFactory?.Invoke(logEvent) ??
+            string routingKey = this.Options.MessageRoutingKeyFactory?.Invoke(logEvent) ??
                            $"l.{logEvent.Level}.s.{(logEvent.Properties.ContainsKey(SourceContext) ? logEvent.Properties[SourceContext].ToString().Trim('"') : Unknown)}"
                            .ToLowerInvariant();
 
-            //TODO: what if channel from pool can't be used ?
             IModel channel = this.channelsPool.Get();
 
             try
             {
-                channel.BasicPublish(this.Options.ExchangeName, routingKey, this.Options.Mandatory, this.Options.BasicProperties, body);
+                BasicProperties basicProperties = new RabbitMQ.Client.Framing.BasicProperties();
+                basicProperties.Persistent = this.Options.ExchangeDurable;
+                basicProperties.Expiration = ((long) this.Options.MessageExpiration.TotalMilliseconds).ToString("D");
+
+                this.Options.MessagePropertiesSetup?.Invoke(logEvent, basicProperties);
+                
+                channel.BasicPublish(this.Options.ExchangeName, routingKey, this.Options.MessageMandatory, basicProperties, body);
 
                 if (this.Options.ConfirmPublish)
                 {
@@ -192,8 +198,7 @@ namespace Serilog.Sinks.RabbitMq
                     this.Connection.Close();
                     this.Connection.Dispose();
                 }
-
-                this.Connection = null;
+                
                 disposed = true;
             }
 
