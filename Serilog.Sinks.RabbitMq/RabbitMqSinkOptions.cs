@@ -6,10 +6,14 @@ using Serilog.Events;
 namespace Serilog.Sinks.RabbitMq
 {
     public class RabbitMqSinkOptions
-    {             
+    {
+        public const string DefaultWriteToExchange = "exc.serilog.logs";
+
+        public const string DefaultAuditToExchange = "exc.serilog.audit";
+        
         public int ChannelsPoolMaxRetained { get; set; } = 5;
 
-        public string ExchangeName { get; set; } = RabbitMqSink.DefaultExchange;
+        public string ExchangeName { get; set; } = DefaultWriteToExchange;
 
         public bool ExchangeDurable { get; set; } = true;
 

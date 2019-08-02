@@ -14,7 +14,7 @@ namespace Serilog.Sinks.RabbitMq
     public class RabbitMqSink : ILogEventSink, IDisposable
     {
         public const string DefaultClientProviderName = nameof(RabbitMqSink);
-        public const string DefaultExchange = "exc.serilog";
+        
         public const string Unknown = "unknown";
         public const string SourceContext = "SourceContext";
 
@@ -159,14 +159,12 @@ namespace Serilog.Sinks.RabbitMq
                            $"l.{logEvent.Level}.s.{(logEvent.Properties.ContainsKey(SourceContext) ? logEvent.Properties[SourceContext].ToString().Trim('"') : Unknown)}"
                            .ToLowerInvariant();
 
-            string exchange = this.Options.ExchangeName ?? DefaultExchange;
-
             //TODO: what if channel from pool can't be used ?
             IModel channel = this.channelsPool.Get();
 
             try
             {
-                channel.BasicPublish(exchange, routingKey, this.Options.Mandatory, this.Options.BasicProperties, body);
+                channel.BasicPublish(this.Options.ExchangeName, routingKey, this.Options.Mandatory, this.Options.BasicProperties, body);
 
                 if (this.Options.ConfirmPublish)
                 {

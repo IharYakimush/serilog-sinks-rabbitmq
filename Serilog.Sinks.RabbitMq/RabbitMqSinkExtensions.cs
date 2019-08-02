@@ -34,6 +34,7 @@ namespace Serilog.Sinks.RabbitMq
 
             // Set confirm publish by default for Audit
             options.ConfirmPublish = true;
+            options.ExchangeName = RabbitMqSinkOptions.DefaultAuditToExchange;
             optionsSetup.Invoke(options);
 
             return options;

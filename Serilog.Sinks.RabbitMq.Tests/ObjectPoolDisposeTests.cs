@@ -1,42 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.ObjectPool;
+using Moq;
+using RabbitMQ.Client;
+using Serilog.Formatting.Json;
 using Xunit;
 
 namespace Serilog.Sinks.RabbitMq.Tests
-{
-    public class MyClass : IDisposable
-    {
-        public MyClass()
-        {
-            Console.WriteLine("Created");
-        }
-        public void Dispose()
-        {
-            Console.WriteLine("Disposed");
-        }
-    }
-
+{    
     public class ObjectPoolDisposeTests
     {
         [Fact]
         public void DoTest()
         {
-            ObjectPool<MyClass> pool =
-                new DefaultObjectPoolProvider {MaximumRetained = 2}.Create(new DefaultPooledObjectPolicy<MyClass>());
+            Mock<IModel> model = new Mock<IModel>();
 
-            //ObjectPool<MyClass> pool = new LeakTrackingObjectPool<MyClass>(new DefaultObjectPool<MyClass>(new DefaultPooledObjectPolicy<MyClass>(), 2));
-            var o1 = pool.Get();
-            var o2 = pool.Get();
-            var o3 = pool.Get();
-            var o4 = pool.Get();
+            Mock<IConnection> connection = new Mock<IConnection>();
 
-            pool.Return(o1);
-            pool.Return(o2);
-            pool.Return(o3);
-            var o5 = pool.Get();
+            connection.Setup(c => c.IsOpen).Returns(true);
+            connection.Setup(c => c.CreateModel()).Returns(model.Object);
 
-            Assert.Equal(o1, o5);
-        }        
+            RabbitMqSink sink = new RabbitMqSink(new RabbitMqSinkOptions(), connection.Object, new JsonFormatter());
+
+            connection.Verify(c => c.CreateModel(), Times.Once);
+            // model returned to pool and disposed because IsOpen equal false
+            model.Verify(m => m.Dispose(), Times.Once);
+        }
     }
 }
