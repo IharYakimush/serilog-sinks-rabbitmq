@@ -10,16 +10,29 @@ namespace Serilog.Sinks.RabbitMq
         public const string DefaultWriteToExchange = "exc.serilog.logs";
 
         public const string DefaultAuditToExchange = "exc.serilog.audit";
-        
-        public int ChannelsPoolMaxRetained { get; set; } = 5;
+        private string _exchangeName = DefaultWriteToExchange;
+        private string _exchangeType = RabbitMQ.Client.ExchangeType.Topic;
+        private int _channelsPoolMaxRetained = 5;
 
-        public string ExchangeName { get; set; } = DefaultWriteToExchange;
-
+        public int ChannelsPoolMaxRetained
+        {
+            get => _channelsPoolMaxRetained;
+            set => _channelsPoolMaxRetained = value >= 0 ? value : throw new ArgumentException();
+        }
+        public string ExchangeName
+        {
+            get => _exchangeName;
+            set => _exchangeName = !string.IsNullOrWhiteSpace(value) ? value : throw new ArgumentException();
+        }
         public bool ExchangeDurable { get; set; } = true;
 
         public bool ExchangeAutoDelete { get; set; } = false;
 
-        public string ExchangeType { get; set; } = RabbitMQ.Client.ExchangeType.Topic;
+        public string ExchangeType
+        {
+            get => _exchangeType;
+            set => _exchangeType = RabbitMQ.Client.ExchangeType.All().Contains(value) ? value : throw new ArgumentException($"Allowed values {string.Join(", ", RabbitMQ.Client.ExchangeType.All())}");
+        }
 
         public IDictionary<string, object> ExchangeArguments { get; set; } = null;
 
