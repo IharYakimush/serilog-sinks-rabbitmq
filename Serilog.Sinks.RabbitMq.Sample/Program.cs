@@ -20,7 +20,7 @@ namespace Serilog.Sinks.RabbitMq.Sample
         {
             LoggerConfiguration loggerConfiguration = new LoggerConfiguration();
             loggerConfiguration.WriteTo.RabbitMq(
-                new RabbitMqSinkOptions {ExchangeName = "exc.logs.sample"},
+                options => options.ExchangeName = "exc.logs.sample",
                 new AmqpTcpEndpoint("localhost", 5672),
                 factory =>
                 {
