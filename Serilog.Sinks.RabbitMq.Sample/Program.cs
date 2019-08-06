@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Sinks.RabbitMq.Client;
@@ -64,6 +65,7 @@ namespace Serilog.Sinks.RabbitMq.Sample
                 lock (SyncObj)
                 {
                     Console.WriteLine($"{e.RoutingKey}: {e.Body.Length}bytes");
+                    Console.WriteLine(Encoding.UTF8.GetString(e.Body));
                 }
 
                 // Confirm that message processed successfully

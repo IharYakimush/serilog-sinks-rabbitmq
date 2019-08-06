@@ -15,6 +15,9 @@
     <AssemblyVersion>2.7.1.0</AssemblyVersion>
     <FileVersion>2.7.1.0</FileVersion>
     <Version>2.7.1</Version>
+    <PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>sign.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
