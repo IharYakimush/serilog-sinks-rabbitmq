@@ -1,5 +1,5 @@
 # serilog-sinks-rabbitmq
-Serilog RabbitMQ Sink
+Serilog RabbitMQ Sink. Can be used with WriteTo and AuditTo. Support publish comfirmations. Use 1 connection per application and 1 channel per thread according to RabbitMQ recomendations.
 # Samples
 
 ### WriteTo
