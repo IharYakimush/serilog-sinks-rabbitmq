@@ -12,9 +12,9 @@
     <PackageTags>serilog sink rabbitmq</PackageTags>
     <PackageId>Serilog.Sinks.RabbitMq.Client</PackageId>
     <AssemblyName>Serilog.Sinks.RabbitMq.Client</AssemblyName>
-    <AssemblyVersion>2.7.1.0</AssemblyVersion>
-    <FileVersion>2.7.1.0</FileVersion>
-    <Version>2.7.1</Version>
+    <AssemblyVersion>1.271.0.0</AssemblyVersion>
+    <FileVersion>1.271.0.0</FileVersion>
+    <Version>1.271.0</Version>
     <PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>sign.snk</AssemblyOriginatorKeyFile>
