@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Serilog.Sinks.RabbitMq\Serilog.Sinks.RabbitMq.csproj" />
+    <ProjectReference Include="..\Serilog.Sinks.RabbitMq\Serilog.Sinks.RabbitMq.Client.csproj" />
   </ItemGroup>
 
 </Project>

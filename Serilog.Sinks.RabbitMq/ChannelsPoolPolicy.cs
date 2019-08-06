@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using RabbitMQ.Client;
 
-namespace Serilog.Sinks.RabbitMq
+namespace Serilog.Sinks.RabbitMq.Client
 {
     public class ChannelsPoolPolicy : IPooledObjectPolicy<IModel>
     {

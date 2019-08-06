@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using RabbitMQ.Client;
 using Serilog.Events;
 
-namespace Serilog.Sinks.RabbitMq
+namespace Serilog.Sinks.RabbitMq.Client
 {
     public class RabbitMqSinkOptions
     {
@@ -53,6 +53,9 @@ namespace Serilog.Sinks.RabbitMq
 
         public Func<LogEvent, string> MessageRoutingKeyFactory { get; set; } = null;
 
+        /// <summary>
+        /// Customize message properties per log event
+        /// </summary>
         public Action<LogEvent, IBasicProperties> MessagePropertiesSetup { get; set; } = null;
 
         public TimeSpan MessageExpiration

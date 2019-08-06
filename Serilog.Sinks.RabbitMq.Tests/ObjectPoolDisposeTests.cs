@@ -4,6 +4,7 @@ using Microsoft.Extensions.ObjectPool;
 using Moq;
 using RabbitMQ.Client;
 using Serilog.Formatting.Json;
+using Serilog.Sinks.RabbitMq.Client;
 using Xunit;
 
 namespace Serilog.Sinks.RabbitMq.Tests

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.RabbitMq", "Serilog.Sinks.RabbitMq\Serilog.Sinks.RabbitMq.csproj", "{3DE021DC-FB57-4F0F-B14F-066DBA99FC2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.RabbitMq.Client", "Serilog.Sinks.RabbitMq\Serilog.Sinks.RabbitMq.Client.csproj", "{3DE021DC-FB57-4F0F-B14F-066DBA99FC2D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.RabbitMq.Tests", "Serilog.Sinks.RabbitMq.Tests\Serilog.Sinks.RabbitMq.Tests.csproj", "{79348922-6DCF-472C-B4F5-D22E57CBA5F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Sinks.RabbitMq.Sample", "Serilog.Sinks.RabbitMq.Sample\Serilog.Sinks.RabbitMq.Sample.csproj", "{05E3F9BF-6EFB-4390-8EBF-47455B5ABC0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.RabbitMq.Sample", "Serilog.Sinks.RabbitMq.Sample\Serilog.Sinks.RabbitMq.Sample.csproj", "{05E3F9BF-6EFB-4390-8EBF-47455B5ABC0E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3CF87C95-7480-41A5-9DB0-D27581627F20}"
 	ProjectSection(SolutionItems) = preProject

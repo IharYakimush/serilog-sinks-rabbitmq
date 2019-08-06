@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Impl;
@@ -10,7 +7,7 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 
-namespace Serilog.Sinks.RabbitMq
+namespace Serilog.Sinks.RabbitMq.Client
 {
     public class RabbitMqSink : ILogEventSink, IDisposable
     {

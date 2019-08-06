@@ -1,6 +1,6 @@
 ﻿using Serilog.Events;
 
-namespace Serilog.Sinks.RabbitMq
+namespace Serilog.Sinks.RabbitMq.Client
 {
     public interface IBinaryFormatter
     {

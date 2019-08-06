@@ -6,7 +6,7 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 
-namespace Serilog.Sinks.RabbitMq
+namespace Serilog.Sinks.RabbitMq.Client
 {
     public static class RabbitMqSinkExtensions
     {

@@ -1,11 +1,11 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using Serilog.Events;
 using Serilog.Formatting;
-using System.IO;
-using System.Text;
 
-namespace Serilog.Sinks.RabbitMq
+namespace Serilog.Sinks.RabbitMq.Client
 {
     public class TextToBinaryFormatter : IBinaryFormatter
     {
