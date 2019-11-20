@@ -10,6 +10,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog.Core;
 using Serilog.Formatting.Json;
+using Serilog.Sinks.RabbitMq.Json;
 
 namespace Serilog.Sinks.RabbitMq.Sample
 {
@@ -34,7 +35,10 @@ namespace Serilog.Sinks.RabbitMq.Sample
                     factory.UserName = "rabbitmq";
                     factory.Password = "rabbitmq";
                 },
-                new JsonFormatter());
+                new JsonToUtf8BytesFormatter());
+
+            LogEventJsonConverterOptions converterOptions = new LogEventJsonConverterOptions();
+            converterOptions.JsonOptions.WriteIndented = true;
 
             loggerConfiguration.AuditTo.RabbitMq(
                 options =>
@@ -42,7 +46,7 @@ namespace Serilog.Sinks.RabbitMq.Sample
                     options.ExchangeName = "exc.audit.sample";
 
                     // By default for AuditTo
-                    options.ConfirmPublish = true;                    
+                    options.ConfirmPublish = true;
                     options.ConfirmPublishTimeout = TimeSpan.FromSeconds(5);
                 },
                 new AmqpTcpEndpoint("localhost", 5672),
@@ -51,7 +55,7 @@ namespace Serilog.Sinks.RabbitMq.Sample
                     factory.UserName = "rabbitmq";
                     factory.Password = "rabbitmq";
                 },
-                new JsonFormatter());
+                new JsonToUtf8BytesFormatter(converterOptions));
 
             Logger logger = loggerConfiguration.CreateLogger();
 
@@ -68,7 +72,7 @@ namespace Serilog.Sinks.RabbitMq.Sample
 
             ILogger<Program> msLogger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
-            msLogger.LogError("Some error");
+            msLogger.LogError(new EventId(500, "UnhandledException"), new ArgumentNullException("msg"), "Some error {p1}", 123);
         }
 
         public static void Subscribe(string exc, string queue, string routingKey)
