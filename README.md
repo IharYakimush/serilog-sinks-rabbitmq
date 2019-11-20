@@ -41,3 +41,5 @@ LoggerConfiguration loggerConfiguration = new LoggerConfiguration();
         },
         new JsonFormatter());
 ```
+# Nuget
+https://www.nuget.org/packages/Serilog.Sinks.RabbitMq.Client
