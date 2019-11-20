@@ -203,8 +203,8 @@ namespace Serilog.Sinks.RabbitMq.Client
         }
 
         private void Initialize()
-        {            
-            this.channelsPool = new DisposableObjectPool<IModel>(new ChannelsPoolPolicy(this.Connection, this.Options), this.Options.ChannelsPoolMaxRetained);
+        {
+            this.channelsPool = new DefaultObjectPoolProvider() { MaximumRetained = this.Options.ChannelsPoolMaxRetained }.Create(new ChannelsPoolPolicy(this.Connection, this.Options));
         }
 
         private void Validate()

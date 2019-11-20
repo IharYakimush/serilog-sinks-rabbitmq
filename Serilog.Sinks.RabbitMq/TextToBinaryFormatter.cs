@@ -32,9 +32,9 @@ namespace Serilog.Sinks.RabbitMq.Client
         public Encoding Encoding { get; }
 
         public byte[] GetBytes(LogEvent logEvent)
-        {
+        {            
             StringBuilder sb = this.stringBuildersPool.Get();
-
+             
             try
             {
                 using (TextWriter writer = new StringWriter(sb))
