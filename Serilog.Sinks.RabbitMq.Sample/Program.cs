@@ -72,7 +72,8 @@ namespace Serilog.Sinks.RabbitMq.Sample
 
             ILogger<Program> msLogger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
-            msLogger.LogError(new EventId(500, "UnhandledException"), new ArgumentNullException("msg"), "Some error {p1}", 123);
+            msLogger.LogError(new EventId(500, "UnhandledException"), new ArgumentNullException("msg"),
+                "Some error {P1} {p2} {@p3}", 123, DateTime.UtcNow, new {a = "qwe", b = 112});
         }
 
         public static void Subscribe(string exc, string queue, string routingKey)
