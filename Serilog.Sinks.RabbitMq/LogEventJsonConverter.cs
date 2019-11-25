@@ -237,7 +237,7 @@ namespace Serilog.Sinks.RabbitMq.Json
 
         private string HandleKeyPrefix(string keyPrefix, string key, bool array)
         {
-            if (keyPrefix == null && (!array || this.Options.ArrayKeyPrefix == null))
+            if (keyPrefix == null && (this.Options.ArrayKeyPrefix == null || !array))
             {
                 return key;
             }

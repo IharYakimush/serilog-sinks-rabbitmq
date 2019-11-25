@@ -12,7 +12,6 @@ namespace Serilog.Sinks.RabbitMq.Client
         public JsonSerializerOptions JsonOptions { get; set; } = new JsonSerializerOptions
         {
             IgnoreNullValues = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
         public bool WriteException { get; set; } = true;
@@ -26,21 +25,51 @@ namespace Serilog.Sinks.RabbitMq.Client
         public string ExceptionPropertyName { get; set; } = "exception";
         public string ObjectTypeTagPropertyName { get; set; } = "_type";
 
-        public string DateTimeOffsetKeyPrefix { get; set; } = "dto_";
-        public string DateTimeKeyPrefix { get; set; } = "dt_";
-        public string StringKeyPrefix { get; set; } = "s_";
-        public string IntKeyPrefix { get; set; } = "i_";
-        public string LongKeyPrefix { get; set; } = "i_";
-        public string FloatKeyPrefix { get; set; } = "f_";
-        public string DoubleKeyPrefix { get; set; } = "f_";
-        public string UintKeyPrefix { get; set; } = "i_";
-        public string UlongKeyPrefix { get; set; } = "i_";
-        public string DecimalKeyPrefix { get; set; } = "d_";
-        public string ObjectKeyPrefix { get; set; } = "o_";
-        public string ArrayKeyPrefix { get; set; } = "a_";
+        public string DateTimeOffsetKeyPrefix { get; set; }
+        public string DateTimeKeyPrefix { get; set; }
+        public string StringKeyPrefix { get; set; }
+        public string IntKeyPrefix { get; set; }
+        public string LongKeyPrefix { get; set; }
+        public string FloatKeyPrefix { get; set; } 
+        public string DoubleKeyPrefix { get; set; }
+        public string UintKeyPrefix { get; set; }
+        public string UlongKeyPrefix { get; set; }
+        public string DecimalKeyPrefix { get; set; }
+        public string ObjectKeyPrefix { get; set; }
+        public string ArrayKeyPrefix { get; set; }
 
         public JsonConverter<DateTimeOffset> DateTimeOffsetConverter { get; set; } = new DefaultDateTimeOffsetConverter();
         public JsonConverter<DateTime> DateTimeConverter { get; set; } = new DefaultDateTimeConverter();
         public JsonConverter<Enum> EnumConverter { get; set; } = new DefaultEnumConverter();
+
+        
+    }
+
+    public static class LogEventJsonConverterOptionsExtensions
+    {
+        public static LogEventJsonConverterOptions WithDefaultKeyPrefixes(this LogEventJsonConverterOptions options)
+        {
+            options.DateTimeOffsetKeyPrefix = "dto_";
+            options.DateTimeKeyPrefix = "dt_";
+            options.StringKeyPrefix = "s_";
+            options.IntKeyPrefix = "i_";
+            options.LongKeyPrefix = "i_";
+            options.FloatKeyPrefix = "f_";
+            options.DoubleKeyPrefix = "f_";
+            options.UintKeyPrefix = "i_";
+            options.UlongKeyPrefix = "i_";
+            options.DecimalKeyPrefix = "d_";
+            options.ObjectKeyPrefix = "o_";
+            options.ArrayKeyPrefix = "a_";
+
+            return options;
+        }
+
+        public static LogEventJsonConverterOptions WithCamelCaseNamingPolicy(this LogEventJsonConverterOptions options)
+        {
+            options.JsonOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+
+            return options;
+        }
     }
 }

@@ -56,22 +56,8 @@ namespace Serilog.Sinks.RabbitMq.Tests
         public void Utf8JsonWithPref()
         {
             byte[] result = null;
-            JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter(new LogEventJsonConverterOptions()
-            {
-                JsonOptions = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = null },
-                ObjectKeyPrefix = "o_",
-                StringKeyPrefix = "s_",
-                DoubleKeyPrefix = "f_",
-                ArrayKeyPrefix = "a_",
-                IntKeyPrefix = "i_",
-                UintKeyPrefix = "i_",
-                UlongKeyPrefix = "i_",
-                LongKeyPrefix = "i_",
-                FloatKeyPrefix = "f_",
-                DateTimeOffsetKeyPrefix = "dt_",
-                DateTimeKeyPrefix = "dt_",
-                DecimalKeyPrefix = "n_",
-            });
+            JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter(
+                new LogEventJsonConverterOptions().WithDefaultKeyPrefixes());
 
             GC.Collect();
             GC.Collect();
@@ -95,22 +81,7 @@ namespace Serilog.Sinks.RabbitMq.Tests
         public void Utf8Json()
         {
             byte[] result = null;
-            JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter(new LogEventJsonConverterOptions()
-            {
-                JsonOptions = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = null},
-                ObjectKeyPrefix = null,
-                StringKeyPrefix = null,
-                DoubleKeyPrefix = null,
-                ArrayKeyPrefix = null,
-                IntKeyPrefix = null,
-                UintKeyPrefix = null,
-                UlongKeyPrefix = null,
-                LongKeyPrefix = null,
-                FloatKeyPrefix = null,
-                DateTimeOffsetKeyPrefix = null,
-                DateTimeKeyPrefix = null,
-                DecimalKeyPrefix = null,
-            });
+            JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter(new LogEventJsonConverterOptions());
 
             GC.Collect();
             GC.Collect();

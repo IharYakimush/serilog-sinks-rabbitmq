@@ -72,7 +72,7 @@ namespace Serilog.Sinks.RabbitMq.Tests
         public void ConvertWithPrefixes()
         {
             JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter(new LogEventJsonConverterOptions()
-                {JsonOptions = new JsonSerializerOptions {WriteIndented = true}});
+                {JsonOptions = new JsonSerializerOptions {WriteIndented = true}}.WithDefaultKeyPrefixes().WithCamelCaseNamingPolicy());
 
             var bytes = formatter.GetBytes(new LogEvent(DateTimeOffset.Now, LogEventLevel.Warning,
                 new Exception("test"), new MessageTemplate("qwe", new MessageTemplateToken[0]), fo));
@@ -86,19 +86,7 @@ namespace Serilog.Sinks.RabbitMq.Tests
         {
             JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter(new LogEventJsonConverterOptions()
             {
-                JsonOptions = new JsonSerializerOptions {WriteIndented = true},
-                ObjectKeyPrefix = null,
-                StringKeyPrefix = null,
-                DoubleKeyPrefix = null,
-                ArrayKeyPrefix = null,
-                IntKeyPrefix = null,
-                UintKeyPrefix = null,
-                UlongKeyPrefix = null,
-                LongKeyPrefix = null,
-                FloatKeyPrefix = null,
-                DateTimeOffsetKeyPrefix = null,
-                DateTimeKeyPrefix = null,
-                DecimalKeyPrefix = null,
+                JsonOptions = new JsonSerializerOptions {WriteIndented = true}
             });
 
             var bytes = formatter.GetBytes(new LogEvent(DateTimeOffset.Now, LogEventLevel.Warning,
