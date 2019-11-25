@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Serilog.Parsing;
@@ -25,6 +26,7 @@ namespace Serilog.Sinks.RabbitMq.Tests
                     {
                         new LogEventProperty("p31", new ScalarValue(2)),
                         new LogEventProperty("p32", new ScalarValue("ppp")),
+                        new LogEventProperty("p33", new ScalarValue(3.5f)),
                     })),
                     new LogEventProperty("p4",new SequenceValue(new []
                     {
@@ -51,12 +53,31 @@ namespace Serilog.Sinks.RabbitMq.Tests
         }
 
         [Fact]
-        public void Utf8Json()
+        public void Utf8JsonWithPref()
         {
             byte[] result = null;
-            JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter();
-            
+            JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter(new LogEventJsonConverterOptions()
+            {
+                JsonOptions = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = null },
+                ObjectKeyPrefix = "o_",
+                StringKeyPrefix = "s_",
+                DoubleKeyPrefix = "f_",
+                ArrayKeyPrefix = "a_",
+                IntKeyPrefix = "i_",
+                UintKeyPrefix = "i_",
+                UlongKeyPrefix = "i_",
+                LongKeyPrefix = "i_",
+                FloatKeyPrefix = "f_",
+                DateTimeOffsetKeyPrefix = "dt_",
+                DateTimeKeyPrefix = "dt_",
+                DecimalKeyPrefix = "n_",
+            });
 
+            GC.Collect();
+            GC.Collect();
+            GC.Collect();
+            GC.WaitForFullGCComplete();
+            long memory1 = GC.GetTotalMemory(true);
             Stopwatch stopwatch = Stopwatch.StartNew();
             for (int i = 0; i < 10000; i++)
             {
@@ -66,6 +87,47 @@ namespace Serilog.Sinks.RabbitMq.Tests
 
             this.output.WriteLine(stopwatch.ElapsedMilliseconds.ToString("F"));
             this.output.WriteLine(result.Length.ToString("D"));
+            this.output.WriteLine((GC.GetTotalMemory(false) - memory1).ToString("D"));
+            this.output.WriteLine(Encoding.UTF8.GetString(result));
+        }
+
+        [Fact]
+        public void Utf8Json()
+        {
+            byte[] result = null;
+            JsonToUtf8BytesFormatter formatter = new JsonToUtf8BytesFormatter(new LogEventJsonConverterOptions()
+            {
+                JsonOptions = new JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = null},
+                ObjectKeyPrefix = null,
+                StringKeyPrefix = null,
+                DoubleKeyPrefix = null,
+                ArrayKeyPrefix = null,
+                IntKeyPrefix = null,
+                UintKeyPrefix = null,
+                UlongKeyPrefix = null,
+                LongKeyPrefix = null,
+                FloatKeyPrefix = null,
+                DateTimeOffsetKeyPrefix = null,
+                DateTimeKeyPrefix = null,
+                DecimalKeyPrefix = null,
+            });
+
+            GC.Collect();
+            GC.Collect();
+            GC.Collect();
+            GC.WaitForFullGCComplete();
+            long memory1 = GC.GetTotalMemory(true);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            for (int i = 0; i < 10000; i++)
+            {
+                result = formatter.GetBytes(logEvent);
+                Assert.True(result.Length > 0);
+            }
+
+            this.output.WriteLine(stopwatch.ElapsedMilliseconds.ToString("F"));
+            this.output.WriteLine(result.Length.ToString("D"));
+            this.output.WriteLine((GC.GetTotalMemory(false) - memory1).ToString("D"));
+            this.output.WriteLine(Encoding.UTF8.GetString(result));
         }
 
         [Fact]
@@ -75,6 +137,11 @@ namespace Serilog.Sinks.RabbitMq.Tests
             IBinaryFormatter formatter = new TextToBinaryFormatter(new JsonFormatter(renderMessage: true),
                 new TextToBinaryFormatterOptions() {Encoding = Encoding.UTF8});
 
+            GC.Collect();
+            GC.Collect();
+            GC.Collect();
+            GC.WaitForFullGCComplete();
+            long memory1 = GC.GetTotalMemory(true);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             for (int i = 0; i < 10000; i++)
@@ -85,6 +152,10 @@ namespace Serilog.Sinks.RabbitMq.Tests
 
             this.output.WriteLine(stopwatch.ElapsedMilliseconds.ToString("F"));
             this.output.WriteLine(result.Length.ToString("D"));
+            this.output.WriteLine((GC.GetTotalMemory(false) - memory1).ToString("D"));
+
+            this.output.WriteLine(Encoding.UTF8.GetString(result));
+
         }
     }
 }

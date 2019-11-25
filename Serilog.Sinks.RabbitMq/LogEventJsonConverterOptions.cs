@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Serilog.Sinks.RabbitMq.Client.JsonConverters;
@@ -36,6 +37,7 @@ namespace Serilog.Sinks.RabbitMq.Client
         public string UlongKeyPrefix { get; set; } = "i_";
         public string DecimalKeyPrefix { get; set; } = "d_";
         public string ObjectKeyPrefix { get; set; } = "o_";
+        public string ArrayKeyPrefix { get; set; } = "a_";
 
         public JsonConverter<DateTimeOffset> DateTimeOffsetConverter { get; set; } = new DefaultDateTimeOffsetConverter();
         public JsonConverter<DateTime> DateTimeConverter { get; set; } = new DefaultDateTimeConverter();
