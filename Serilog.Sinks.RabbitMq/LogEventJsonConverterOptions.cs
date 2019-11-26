@@ -71,5 +71,12 @@ namespace Serilog.Sinks.RabbitMq.Client
 
             return options;
         }
+
+        public static LogEventJsonConverterOptions WithWriteIndented(this LogEventJsonConverterOptions options, bool value = true)
+        {
+            options.JsonOptions.WriteIndented = value;
+
+            return options;
+        }
     }
 }

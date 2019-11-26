@@ -40,8 +40,10 @@ namespace Serilog.Sinks.RabbitMq.Client
             return options;
         }
 
+        #region AmqpTcpEndpoint ITextFormatter
+
         public static LoggerSinkConfiguration RabbitMq(
-            this LoggerSinkConfiguration configuration, 
+            this LoggerSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
             AmqpTcpEndpoint endpoint,
             Action<ConnectionFactory> connectionFactorySetup,
@@ -82,6 +84,97 @@ namespace Serilog.Sinks.RabbitMq.Client
             return configuration;
         }
 
+        #endregion
+
+        #region AmqpTcpEndpoint IBinaryFormatter
+        public static LoggerSinkConfiguration RabbitMq(
+            this LoggerSinkConfiguration configuration,
+            Action<RabbitMqSinkOptions> optionsSetup,
+            AmqpTcpEndpoint endpoint,
+            Action<ConnectionFactory> connectionFactorySetup,
+            IBinaryFormatter binaryFormatter,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            string clientProviderName = null)
+        {
+            RabbitMqSinkOptions options = configuration.Create(optionsSetup);
+
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpoint, connectionFactorySetup, binaryFormatter,
+                clientProviderName);
+
+            configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
+
+            return configuration;
+        }
+
+        public static LoggerAuditSinkConfiguration RabbitMq(
+            this LoggerAuditSinkConfiguration configuration,
+            Action<RabbitMqSinkOptions> optionsSetup,
+            AmqpTcpEndpoint endpoint,
+            Action<ConnectionFactory> connectionFactorySetup,
+            IBinaryFormatter binaryFormatter,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            string clientProviderName = null)
+        {
+            RabbitMqSinkOptions options = configuration.Create(optionsSetup);
+
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpoint, connectionFactorySetup, binaryFormatter,
+                clientProviderName);
+
+            configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
+
+            return configuration;
+        }
+
+        #endregion
+
+        #region AmqpTcpEndpoint JsonToUtf8
+        public static LoggerSinkConfiguration RabbitMq(
+            this LoggerSinkConfiguration configuration,
+            Action<RabbitMqSinkOptions> optionsSetup,
+            AmqpTcpEndpoint endpoint,
+            Action<ConnectionFactory> connectionFactorySetup,
+            LogEventJsonConverterOptions jsonConverterOptions = null,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            string clientProviderName = null)
+        {
+            RabbitMqSinkOptions options = configuration.Create(optionsSetup);
+
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpoint, connectionFactorySetup,
+                new JsonToUtf8BytesFormatter(jsonConverterOptions ?? new LogEventJsonConverterOptions()),
+                clientProviderName);
+
+            configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
+
+            return configuration;
+        }
+
+        public static LoggerAuditSinkConfiguration RabbitMq(
+            this LoggerAuditSinkConfiguration configuration,
+            Action<RabbitMqSinkOptions> optionsSetup,
+            AmqpTcpEndpoint endpoint,
+            Action<ConnectionFactory> connectionFactorySetup,
+            LogEventJsonConverterOptions jsonConverterOptions = null,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            string clientProviderName = null)
+        {
+            RabbitMqSinkOptions options = configuration.Create(optionsSetup);
+
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpoint, connectionFactorySetup,
+                new JsonToUtf8BytesFormatter(jsonConverterOptions ?? new LogEventJsonConverterOptions()),
+                clientProviderName);
+
+            configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
+
+            return configuration;
+        }
+
+        #endregion
+
+        #region IList<AmqpTcpEndpoint> ITextFormatter
         public static LoggerSinkConfiguration RabbitMq(
             this LoggerSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
@@ -124,6 +217,9 @@ namespace Serilog.Sinks.RabbitMq.Client
             return configuration;
         }
 
+        #endregion
+
+        #region IList<AmqpTcpEndpoint> IBinaryFormatter
         public static LoggerSinkConfiguration RabbitMq(
             this LoggerSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
@@ -164,19 +260,23 @@ namespace Serilog.Sinks.RabbitMq.Client
             return configuration;
         }
 
+        #endregion
+
+        #region IList<AmqpTcpEndpoint> JsonToUtf8
         public static LoggerSinkConfiguration RabbitMq(
             this LoggerSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
-            AmqpTcpEndpoint endpoint,
+            IList<AmqpTcpEndpoint> endpoints,
             Action<ConnectionFactory> connectionFactorySetup,
-            IBinaryFormatter binaryFormatter,
+            LogEventJsonConverterOptions jsonConverterOptions = null,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
             LoggingLevelSwitch levelSwitch = null,
             string clientProviderName = null)
         {
             RabbitMqSinkOptions options = configuration.Create(optionsSetup);
 
-            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpoint, connectionFactorySetup, binaryFormatter,
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpoints, connectionFactorySetup,
+                new JsonToUtf8BytesFormatter(jsonConverterOptions ?? new LogEventJsonConverterOptions()),
                 clientProviderName);
 
             configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
@@ -187,16 +287,17 @@ namespace Serilog.Sinks.RabbitMq.Client
         public static LoggerAuditSinkConfiguration RabbitMq(
             this LoggerAuditSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
-            AmqpTcpEndpoint endpoint,
+            IList<AmqpTcpEndpoint> endpoints,
             Action<ConnectionFactory> connectionFactorySetup,
-            IBinaryFormatter binaryFormatter,
+            LogEventJsonConverterOptions jsonConverterOptions = null,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
             LoggingLevelSwitch levelSwitch = null,
             string clientProviderName = null)
         {
             RabbitMqSinkOptions options = configuration.Create(optionsSetup);
 
-            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpoint, connectionFactorySetup, binaryFormatter,
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpoints, connectionFactorySetup,
+                new JsonToUtf8BytesFormatter(jsonConverterOptions ?? new LogEventJsonConverterOptions()),
                 clientProviderName);
 
             configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
@@ -204,6 +305,9 @@ namespace Serilog.Sinks.RabbitMq.Client
             return configuration;
         }
 
+        #endregion
+
+        #region IEndpointResolver ITextFormatter
         public static LoggerSinkConfiguration RabbitMq(
             this LoggerSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
@@ -246,6 +350,9 @@ namespace Serilog.Sinks.RabbitMq.Client
             return configuration;
         }
 
+        #endregion
+
+        #region IEndpointResolver IBinaryFormatter
         public static LoggerSinkConfiguration RabbitMq(
             this LoggerSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
@@ -286,6 +393,54 @@ namespace Serilog.Sinks.RabbitMq.Client
             return configuration;
         }
 
+        #endregion
+
+        #region IEndpointResolver JsonToUtf8
+        public static LoggerSinkConfiguration RabbitMq(
+            this LoggerSinkConfiguration configuration,
+            Action<RabbitMqSinkOptions> optionsSetup,
+            IEndpointResolver endpointResolver,
+            Action<ConnectionFactory> connectionFactorySetup,
+            LogEventJsonConverterOptions jsonConverterOptions = null,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            string clientProviderName = null)
+        {
+            RabbitMqSinkOptions options = configuration.Create(optionsSetup);
+
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpointResolver, connectionFactorySetup,
+                new JsonToUtf8BytesFormatter(jsonConverterOptions ?? new LogEventJsonConverterOptions()),
+                clientProviderName);
+
+            configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
+
+            return configuration;
+        }
+
+        public static LoggerAuditSinkConfiguration RabbitMq(
+            this LoggerAuditSinkConfiguration configuration,
+            Action<RabbitMqSinkOptions> optionsSetup,
+            IEndpointResolver endpointResolver,
+            Action<ConnectionFactory> connectionFactorySetup,
+            LogEventJsonConverterOptions jsonConverterOptions = null,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            string clientProviderName = null)
+        {
+            RabbitMqSinkOptions options = configuration.Create(optionsSetup);
+
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, endpointResolver, connectionFactorySetup,
+                new JsonToUtf8BytesFormatter(jsonConverterOptions ?? new LogEventJsonConverterOptions()),
+                clientProviderName);
+
+            configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
+
+            return configuration;
+        }
+
+        #endregion
+
+        #region IConnection ITextFormatter
         public static LoggerSinkConfiguration RabbitMq(
             this LoggerSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
@@ -326,6 +481,9 @@ namespace Serilog.Sinks.RabbitMq.Client
             return configuration;
         }
 
+        #endregion
+
+        #region IConnection IBinaryFormatter
         public static LoggerSinkConfiguration RabbitMq(
             this LoggerSinkConfiguration configuration,
             Action<RabbitMqSinkOptions> optionsSetup,
@@ -363,5 +521,50 @@ namespace Serilog.Sinks.RabbitMq.Client
 
             return configuration;
         }
+
+        #endregion
+
+        #region IConnection JsonToUtf8
+        public static LoggerSinkConfiguration RabbitMq(
+            this LoggerSinkConfiguration configuration,
+            Action<RabbitMqSinkOptions> optionsSetup,
+            IConnection connection,
+            LogEventJsonConverterOptions jsonConverterOptions = null,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            bool autoCloseConnection = true)
+        {
+            RabbitMqSinkOptions options = configuration.Create(optionsSetup);
+
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, connection,
+                new JsonToUtf8BytesFormatter(jsonConverterOptions ?? new LogEventJsonConverterOptions()),
+                autoCloseConnection);
+
+            configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
+
+            return configuration;
+        }
+
+        public static LoggerAuditSinkConfiguration RabbitMq(
+            this LoggerAuditSinkConfiguration configuration,
+            Action<RabbitMqSinkOptions> optionsSetup,
+            IConnection connection,
+            LogEventJsonConverterOptions jsonConverterOptions = null,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
+            LoggingLevelSwitch levelSwitch = null,
+            bool autoCloseConnection = true)
+        {
+            RabbitMqSinkOptions options = configuration.Create(optionsSetup);
+
+            RabbitMqSink rabbitMqSink = new RabbitMqSink(options, connection,
+                new JsonToUtf8BytesFormatter(jsonConverterOptions ?? new LogEventJsonConverterOptions()),
+                autoCloseConnection);
+
+            configuration.Sink(rabbitMqSink, restrictedToMinimumLevel, levelSwitch);
+
+            return configuration;
+        }
+
+        #endregion
     }
 }

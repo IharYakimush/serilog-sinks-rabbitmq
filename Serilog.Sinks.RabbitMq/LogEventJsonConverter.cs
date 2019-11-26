@@ -245,7 +245,14 @@ namespace Serilog.Sinks.RabbitMq.Json
         {
             if (keyPrefix == null && (this.Options.ArrayKeyPrefix == null || !array))
             {
-                return key;
+                if (this.Options.JsonOptions.PropertyNamingPolicy == null)
+                {
+                    return key;
+                }
+                else
+                {
+                    return this.Options.JsonOptions.PropertyNamingPolicy.ConvertName(key);
+                }
             }
 
             StringBuilder sb = this.stringBuilders.Get();

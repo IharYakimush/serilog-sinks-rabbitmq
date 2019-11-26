@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Sinks.RabbitMq.Client;
@@ -9,7 +10,9 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog.Core;
+using Serilog.Formatting.Display;
 using Serilog.Formatting.Json;
+using Serilog.Formatting.Raw;
 using Serilog.Sinks.RabbitMq.Json;
 
 namespace Serilog.Sinks.RabbitMq.Sample
@@ -34,11 +37,7 @@ namespace Serilog.Sinks.RabbitMq.Sample
                 {
                     factory.UserName = "rabbitmq";
                     factory.Password = "rabbitmq";
-                },
-                new JsonToUtf8BytesFormatter());
-
-            LogEventJsonConverterOptions converterOptions = new LogEventJsonConverterOptions();
-            converterOptions.JsonOptions.WriteIndented = true;
+                }, new JsonFormatter());
 
             loggerConfiguration.AuditTo.RabbitMq(
                 options =>
@@ -55,7 +54,7 @@ namespace Serilog.Sinks.RabbitMq.Sample
                     factory.UserName = "rabbitmq";
                     factory.Password = "rabbitmq";
                 },
-                new JsonToUtf8BytesFormatter(converterOptions));
+                new LogEventJsonConverterOptions().WithCamelCaseNamingPolicy().WithWriteIndented().WithDefaultKeyPrefixes());
 
             Logger logger = loggerConfiguration.CreateLogger();
 
