@@ -15,7 +15,7 @@ namespace Serilog.Sinks.RabbitMq.Json
     public class LogEventJsonConverter : JsonConverter<LogEvent>
     {
         private readonly ObjectPool<StringBuilder> stringBuilders =
-            new DefaultObjectPoolProvider().CreateStringBuilderPool(100, 5);
+            new DefaultObjectPoolProvider {MaximumRetained = 5}.CreateStringBuilderPool(100, 200);
         public LogEventJsonConverterOptions Options { get; }
 
         public LogEventJsonConverter(LogEventJsonConverterOptions options)
