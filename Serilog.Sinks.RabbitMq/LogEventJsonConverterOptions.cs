@@ -15,7 +15,7 @@ namespace Serilog.Sinks.RabbitMq.Client
         };
 
         public bool WriteException { get; set; } = true;
-        public bool WriteObjectTypeTag { get; set; } = true;
+        public bool WriteObjectTypeTag { get; set; } = false;
         public bool WriteMessage { get; set; } = true;
         public bool RenderMessage { get; set; } = true;
 
@@ -28,6 +28,7 @@ namespace Serilog.Sinks.RabbitMq.Client
         public string DateTimeOffsetKeyPrefix { get; set; }
         public string DateTimeKeyPrefix { get; set; }
         public string StringKeyPrefix { get; set; }
+        public string EnumKeyPrefix { get; set; }
         public string IntKeyPrefix { get; set; }
         public string LongKeyPrefix { get; set; }
         public string FloatKeyPrefix { get; set; } 
@@ -41,17 +42,16 @@ namespace Serilog.Sinks.RabbitMq.Client
         public JsonConverter<DateTimeOffset> DateTimeOffsetConverter { get; set; } = new DefaultDateTimeOffsetConverter();
         public JsonConverter<DateTime> DateTimeConverter { get; set; } = new DefaultDateTimeConverter();
         public JsonConverter<Enum> EnumConverter { get; set; } = new DefaultEnumConverter();
-
-        
     }
 
     public static class LogEventJsonConverterOptionsExtensions
     {
         public static LogEventJsonConverterOptions WithDefaultKeyPrefixes(this LogEventJsonConverterOptions options)
         {
-            options.DateTimeOffsetKeyPrefix = "dto_";
+            options.DateTimeOffsetKeyPrefix = "dt_";
             options.DateTimeKeyPrefix = "dt_";
             options.StringKeyPrefix = "s_";
+            options.EnumKeyPrefix = "k_";
             options.IntKeyPrefix = "i_";
             options.LongKeyPrefix = "i_";
             options.FloatKeyPrefix = "f_";

@@ -23,8 +23,6 @@ namespace Serilog.Sinks.RabbitMq.Json
             Options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        private const string ExceptionKey = "exception";
-
         public override LogEvent Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             throw new NotImplementedException();
@@ -229,6 +227,14 @@ namespace Serilog.Sinks.RabbitMq.Json
                     }
                     this.Options.DateTimeConverter.Write(writer, val, this.Options.JsonOptions);
                     break;
+                case Enum val:
+                    if (key != null)
+                    {
+                        writer.WritePropertyName(HandleKeyPrefix(this.Options.EnumKeyPrefix, key, array));
+                        if (array) writer.WriteStartArray();
+                    }
+                    this.Options.EnumConverter.Write(writer, val, this.Options.JsonOptions);
+                    break;
                 default: return false;
             }
 
@@ -294,8 +300,6 @@ namespace Serilog.Sinks.RabbitMq.Json
 
         private void WriteTimestamp(Utf8JsonWriter writer, LogEvent value)
         {
-            //TODO: choose default timestamp format
-            //TODO: init converters in constructor
             writer.WritePropertyName(this.Options.TimestampPropertyName);
 
             this.Options.DateTimeOffsetConverter.Write(writer, value.Timestamp, this.Options.JsonOptions);
