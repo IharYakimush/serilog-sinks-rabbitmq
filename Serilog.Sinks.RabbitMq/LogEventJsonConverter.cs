@@ -163,6 +163,14 @@ namespace Serilog.Sinks.RabbitMq.Json
                     }
                     writer.WriteNumberValue(val);
                     break;
+                case bool val:
+                    if (key != null)
+                    {
+                        writer.WritePropertyName(HandleKeyPrefix(this.Options.BooleanKeyPrefix, key, array));
+                        if (array) writer.WriteStartArray();
+                    }
+                    writer.WriteBooleanValue(val);
+                    break;
                 case long val:
                     if (key != null)
                     {

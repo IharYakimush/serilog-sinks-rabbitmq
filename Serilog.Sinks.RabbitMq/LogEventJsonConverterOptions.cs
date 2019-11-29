@@ -28,6 +28,7 @@ namespace Serilog.Sinks.RabbitMq.Client
         public string DateTimeOffsetKeyPrefix { get; set; }
         public string DateTimeKeyPrefix { get; set; }
         public string StringKeyPrefix { get; set; }
+        public string BooleanKeyPrefix { get; set; }
         public string EnumKeyPrefix { get; set; }
         public string IntKeyPrefix { get; set; }
         public string LongKeyPrefix { get; set; }
@@ -51,6 +52,7 @@ namespace Serilog.Sinks.RabbitMq.Client
             options.DateTimeOffsetKeyPrefix = "dt_";
             options.DateTimeKeyPrefix = "dt_";
             options.StringKeyPrefix = "s_";
+            options.BooleanKeyPrefix = "b_";
             options.EnumKeyPrefix = "k_";
             options.IntKeyPrefix = "i_";
             options.LongKeyPrefix = "i_";

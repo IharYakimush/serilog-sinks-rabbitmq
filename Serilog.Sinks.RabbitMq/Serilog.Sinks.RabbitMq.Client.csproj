@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Description>Serilog RabbitMQ Sink. Can be used with WriteTo and AuditTo. Support publish comfirmations. Use 1 connection per application and 1 channel per thread according to RabbitMQ recomendations.</Description>
+    <Description>Serilog RabbitMQ Sink. Can be used with WriteTo and AuditTo. Support publish comfirmations. Use 1 connection per application and 1 channel per thread according to RabbitMQ recomendations. Has high performance JsonToUtf8 serializer</Description>
     <Authors>IharYakimush</Authors>
     <Product>Serilog.Sinks.RabbitMq.Client</Product>
     <PackageLicenseUrl>https://github.com/IharYakimush/serilog-sinks-rabbitmq/blob/master/LICENSE</PackageLicenseUrl>
@@ -12,12 +12,13 @@
     <PackageTags>serilog sink rabbitmq</PackageTags>
     <PackageId>Serilog.Sinks.RabbitMq.Client</PackageId>
     <AssemblyName>Serilog.Sinks.RabbitMq.Client</AssemblyName>
-    <AssemblyVersion>3.271.0.0</AssemblyVersion>
-    <FileVersion>3.271.0.0</FileVersion>
-    <Version>3.271.0</Version>
+    <AssemblyVersion>3.271.1.0</AssemblyVersion>
+    <FileVersion>3.271.1.0</FileVersion>
+    <Version>3.271.1</Version>
     <PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>sign.snk</AssemblyOriginatorKeyFile>
+    <PackageReleaseNotes>Support boolean values in JsonToUtf8 serializer</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

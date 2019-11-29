@@ -29,6 +29,7 @@ namespace Serilog.Sinks.RabbitMq.Tests
 
         static List<LogEventProperty> o1 = new List<LogEventProperty>
         {
+            new LogEventProperty("pb1", new ScalarValue(true)),
             new LogEventProperty("pe1", new ScalarValue(LogEventLevel.Debug)),
             new LogEventProperty("ps1", new ScalarValue("s1")),
             new LogEventProperty("pi1", new ScalarValue(1)),

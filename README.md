@@ -1,5 +1,5 @@
 # serilog-sinks-rabbitmq
-Serilog RabbitMQ Sink. Can be used with WriteTo and AuditTo. Support publish comfirmations. Use 1 connection per application and 1 channel per thread according to RabbitMQ recomendations. Has high prerformance JsonToUtf8 serializer
+Serilog RabbitMQ Sink. Can be used with WriteTo and AuditTo. Support publish comfirmations. Use 1 connection per application and 1 channel per thread according to RabbitMQ recomendations. Has high performance JsonToUtf8 serializer
 # Samples
 
 ### WriteTo with default JsonToUtf8 serializer settings
